@@ -4,54 +4,32 @@ on:
   push:
     branches: [master]
 
-env:
-  REGISTRY: ghcr.io
-  FRONTEND_IMAGE: ghcr.io/hawkeyepierce89/wp-dashboard-frontend
-  NGINX_IMAGE: ghcr.io/hawkeyepierce89/wp-dashboard-nginx
-  WORDPRESS_IMAGE: ghcr.io/hawkeyepierce89/wp-dashboard-wordpress
-
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     steps:
       - uses: actions/checkout@v4
 
-      - uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build images
+        run: |
+          docker build -t wp-dashboard-frontend -f frontend/Dockerfile.prod frontend/
+          docker build -t wp-dashboard-nginx nginx/
+          docker build -t wp-dashboard-wordpress wordpress/
 
-      - name: Build & push frontend
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile.prod
-          push: true
-          tags: ${{ env.FRONTEND_IMAGE }}:latest,${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+      - name: Save and compress images
+        run: docker save wp-dashboard-frontend wp-dashboard-nginx wp-dashboard-wordpress | gzip > images.tar.gz
 
-      - name: Build & push nginx
-        uses: docker/build-push-action@v5
-        with:
-          context: ./nginx
-          push: true
-          tags: ${{ env.NGINX_IMAGE }}:latest,${{ env.NGINX_IMAGE }}:${{ github.sha }}
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/key
+          chmod 600 ~/.ssh/key
+          ssh-keyscan -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: Build & push wordpress
-        uses: docker/build-push-action@v5
-        with:
-          context: ./wordpress
-          push: true
-          tags: ${{ env.WORDPRESS_IMAGE }}:latest,${{ env.WORDPRESS_IMAGE }}:${{ github.sha }}
+      - name: Transfer images to VPS
+        run: scp -i ~/.ssh/key -P ${{ secrets.VPS_PORT }} images.tar.gz ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/images.tar.gz
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy via SSH
+      - name: Deploy on VPS
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -62,7 +40,7 @@ jobs:
             set -e
             APP_DIR=~/wordpress-nextjs-analytics-dashboard
 
-            if [ ! -d "$APP_DIR" ]; then
+            if [ ! -d "$APP_DIR/.git" ]; then
               git clone https://github.com/HawkeyePierce89/wordpress-nextjs-analytics-dashboard.git "$APP_DIR"
             fi
 
@@ -70,8 +48,11 @@ jobs:
             git fetch origin master
             git reset --hard origin/master
 
-            docker compose -f docker-compose.prod.yml pull frontend nginx wordpress
-            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            docker load < /tmp/images.tar.gz
+            rm -f /tmp/images.tar.gz
 
-            sleep 10
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            docker image prune -f
+
+            sleep 5
             docker compose -f docker-compose.prod.yml ps
