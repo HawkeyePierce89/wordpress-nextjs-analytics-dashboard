@@ -1,11 +1,54 @@
-name: Deploy to VPS
+name: Build & Deploy
 
 on:
   push:
     branches: [master]
 
+env:
+  REGISTRY: ghcr.io
+  FRONTEND_IMAGE: ghcr.io/hawkeyepierce89/wp-dashboard-frontend
+  NGINX_IMAGE: ghcr.io/hawkeyepierce89/wp-dashboard-nginx
+  WORDPRESS_IMAGE: ghcr.io/hawkeyepierce89/wp-dashboard-wordpress
+
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile.prod
+          push: true
+          tags: ${{ env.FRONTEND_IMAGE }}:latest,${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+
+      - name: Build & push nginx
+        uses: docker/build-push-action@v5
+        with:
+          context: ./nginx
+          push: true
+          tags: ${{ env.NGINX_IMAGE }}:latest,${{ env.NGINX_IMAGE }}:${{ github.sha }}
+
+      - name: Build & push wordpress
+        uses: docker/build-push-action@v5
+        with:
+          context: ./wordpress
+          push: true
+          tags: ${{ env.WORDPRESS_IMAGE }}:latest,${{ env.WORDPRESS_IMAGE }}:${{ github.sha }}
+
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Deploy via SSH
@@ -19,7 +62,6 @@ jobs:
             set -e
             APP_DIR=~/wordpress-nextjs-analytics-dashboard
 
-            # First deploy: clone. Subsequent: pull.
             if [ ! -d "$APP_DIR" ]; then
               git clone https://github.com/HawkeyePierce89/wordpress-nextjs-analytics-dashboard.git "$APP_DIR"
             fi
@@ -28,8 +70,8 @@ jobs:
             git fetch origin master
             git reset --hard origin/master
 
-            docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+            docker compose -f docker-compose.prod.yml pull frontend nginx wordpress
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
-            # Wait for containers to be healthy
             sleep 10
             docker compose -f docker-compose.prod.yml ps

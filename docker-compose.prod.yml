@@ -11,7 +11,7 @@ services:
       - db_data:/var/lib/mysql
 
   wordpress:
-    build: ./wordpress
+    image: ghcr.io/hawkeyepierce89/wp-dashboard-wordpress:latest
     restart: unless-stopped
     depends_on:
       - db
@@ -31,15 +31,13 @@ services:
       - ./wordpress/theme/suspended-starter:/var/www/html/wp-content/themes/suspended-starter
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.prod
+    image: ghcr.io/hawkeyepierce89/wp-dashboard-frontend:latest
     restart: unless-stopped
     depends_on:
       - wordpress
 
   nginx:
-    build: ./nginx
+    image: ghcr.io/hawkeyepierce89/wp-dashboard-nginx:latest
     restart: unless-stopped
     depends_on:
       - frontend
