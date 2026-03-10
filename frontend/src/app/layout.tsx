@@ -21,7 +21,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-gray-950 text-gray-100 antialiased`}>
         <Providers>
           <Sidebar />
-          <main className="ml-[220px] min-h-screen p-6">{children}</main>
+          <main className="ml-0 md:ml-[220px] min-h-screen p-6 pt-14 md:pt-6">{children}</main>
         </Providers>
       </body>
     </html>

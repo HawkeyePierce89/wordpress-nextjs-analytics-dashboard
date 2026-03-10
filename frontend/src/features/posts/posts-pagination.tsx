@@ -51,7 +51,7 @@ export function PostsPagination({
   const btnActive = 'bg-blue-500 text-white hover:bg-blue-400';
 
   return (
-    <div className="flex items-center justify-between mt-4">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mt-4">
       <p className="text-sm text-gray-400">
         Showing {from}–{to} of {total} posts
       </p>

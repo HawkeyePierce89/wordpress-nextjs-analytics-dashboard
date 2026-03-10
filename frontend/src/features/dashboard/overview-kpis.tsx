@@ -20,7 +20,7 @@ function formatReadingTime(minutes: number): string {
 export function OverviewKpis({ data }: OverviewKpisProps) {
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KpiCard
           title="Total Posts"
           value={data.totalPosts}
@@ -42,7 +42,7 @@ export function OverviewKpis({ data }: OverviewKpisProps) {
           delta={{ value: '3%', positive: false }}
         />
       </div>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <KpiCard
           title="Drafts"
           value={data.draftPosts}

@@ -23,16 +23,16 @@ export default function AnalyticsPage() {
 
       {isLoading && (
         <>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <CardSkeleton />
             <CardSkeleton />
           </div>
           <CardSkeleton />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <CardSkeleton />
             <CardSkeleton />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <CardSkeleton />
             <CardSkeleton />
           </div>
@@ -49,7 +49,7 @@ export default function AnalyticsPage() {
       {data && (
         <>
           {/* 2-col: Publishing Trend + Draft vs Published */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <PublishingTrendChart postsPerMonth={data.postsPerMonth} />
             <DraftVsPublishedChart draftVsPublished={data.draftVsPublished} />
           </div>
@@ -60,13 +60,13 @@ export default function AnalyticsPage() {
           />
 
           {/* 2-col: Top Categories + Top Authors */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <TopCategoriesChart topCategories={data.topCategories} />
             <TopAuthorsChart topAuthors={data.topAuthors} />
           </div>
 
           {/* 2-col: Content Health + Top Posts */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <ContentHealthSummary contentHealth={data.contentHealth} />
             <TopPostsByViews topPostsByViews={data.topPostsByViews} />
           </div>

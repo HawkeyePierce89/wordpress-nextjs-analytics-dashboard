@@ -21,17 +21,17 @@ export default function DashboardPage() {
 
       {isLoading && (
         <>
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <CardSkeleton key={i} />
             ))}
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {Array.from({ length: 3 }).map((_, i) => (
               <CardSkeleton key={i} />
             ))}
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <CardSkeleton />
             <CardSkeleton />
           </div>
@@ -49,12 +49,12 @@ export default function DashboardPage() {
         <>
           <OverviewKpis data={data} />
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <PostsByMonthChart postsPerMonth={data.postsPerMonth} />
             <PostsByCategoryChart postsByCategory={data.postsByCategory} />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <TopPostsTable topPosts={data.topPosts} />
             <RecentActivity events={data.recentActivity} />
           </div>

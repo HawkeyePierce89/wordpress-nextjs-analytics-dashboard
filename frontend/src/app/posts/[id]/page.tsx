@@ -24,7 +24,7 @@ function PostDetailsSkeleton() {
         <Skeleton className="h-8 w-2/3" />
         <Skeleton className="h-4 w-1/4" />
       </div>
-      <div className="grid gap-6" style={{ gridTemplateColumns: '1fr 320px' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
         <div className="space-y-4">
           <Skeleton className="h-24 w-full" />
           <Skeleton className="h-48 w-full" />
@@ -80,7 +80,7 @@ export default function PostDetailsPage({ params }: { params: Params }) {
       <p className="text-sm text-gray-400 -mt-4">/{post.slug}</p>
 
       {/* Two-column layout */}
-      <div className="grid gap-6" style={{ gridTemplateColumns: '1fr 320px' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
         {/* Left column */}
         <div className="space-y-4 min-w-0">
           {/* Excerpt */}

@@ -68,6 +68,7 @@ const columnDefs: ColumnDef<Post>[] = [
     id: 'categories',
     accessorFn: (row) => row.categories[0]?.name ?? '—',
     header: 'Category',
+    meta: { hideOnMobile: true },
     cell: ({ getValue }) => {
       const cat = getValue() as string;
       if (cat === '—') return <span className="text-gray-500">—</span>;
@@ -90,6 +91,7 @@ const columnDefs: ColumnDef<Post>[] = [
     id: 'readingTimeMinutes',
     accessorKey: 'readingTimeMinutes',
     header: 'Read Time',
+    meta: { hideOnMobile: true },
     cell: ({ getValue }) => (
       <span className="text-gray-400">{getValue() as number} min</span>
     ),
@@ -108,6 +110,7 @@ const columnDefs: ColumnDef<Post>[] = [
     id: 'engagementScore',
     accessorFn: (row) => row.metrics.engagementScore,
     header: 'Engagement',
+    meta: { hideOnMobile: true },
     cell: ({ getValue }) => {
       const v = getValue() as number | undefined;
       if (v == null) return <span className="text-gray-500">—</span>;
@@ -241,7 +244,7 @@ export function PostsTable({ posts, isLoading, filters, setFilter }: PostsTableP
                       key={header.id}
                       className={`px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider select-none ${
                         isSortable ? 'cursor-pointer hover:text-gray-200' : ''
-                      }`}
+                      } ${(header.column.columnDef.meta as Record<string, boolean> | undefined)?.hideOnMobile ? 'hidden md:table-cell' : ''}`}
                       onClick={
                         isSortable
                           ? header.column.getToggleSortingHandler()
@@ -291,7 +294,7 @@ export function PostsTable({ posts, isLoading, filters, setFilter }: PostsTableP
                   onClick={() => router.push(`/posts/${row.original.id}`)}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-4 py-3">
+                    <td key={cell.id} className={`px-4 py-3 ${(cell.column.columnDef.meta as Record<string, boolean> | undefined)?.hideOnMobile ? 'hidden md:table-cell' : ''}`}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

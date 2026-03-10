@@ -41,7 +41,7 @@ export function PostsFilters({
         placeholder="Search posts..."
         value={searchValue}
         onChange={handleSearchChange}
-        className={`${inputClass} w-52`}
+        className={`${inputClass} w-full sm:w-52`}
       />
 
       <select
@@ -49,7 +49,7 @@ export function PostsFilters({
         onChange={(e) =>
           setFilter('status', e.target.value as PostsFilterState['status'])
         }
-        className={inputClass}
+        className={`${inputClass} w-full sm:w-auto`}
       >
         <option value="">All Statuses</option>
         <option value="draft">Draft</option>
@@ -65,7 +65,7 @@ export function PostsFilters({
             e.target.value ? Number(e.target.value) : ''
           )
         }
-        className={inputClass}
+        className={`${inputClass} w-full sm:w-auto`}
       >
         <option value="">All Categories</option>
         {categories.map((c) => (
@@ -80,7 +80,7 @@ export function PostsFilters({
         onChange={(e) =>
           setFilter('authorId', e.target.value ? Number(e.target.value) : '')
         }
-        className={inputClass}
+        className={`${inputClass} w-full sm:w-auto`}
       >
         <option value="">All Authors</option>
         {authors.map((a) => (
