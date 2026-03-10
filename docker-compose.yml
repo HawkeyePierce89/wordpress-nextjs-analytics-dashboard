@@ -1,0 +1,48 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  wordpress:
+    build: ./wordpress
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8088:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DEBUG: "1"
+    volumes:
+      - wp_data:/var/www/html
+      - ./wordpress/plugins/analytics-dashboard:/var/www/html/wp-content/plugins/analytics-dashboard
+      - ./wordpress/theme/suspended-starter:/var/www/html/wp-content/themes/suspended-starter
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - wordpress
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_WP_API_URL: http://localhost:8088/wp-json/dashboard/v1
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+
+volumes:
+  db_data:
+  wp_data:

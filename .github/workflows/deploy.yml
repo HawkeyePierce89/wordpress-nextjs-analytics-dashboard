@@ -1,0 +1,35 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            set -e
+            APP_DIR=~/wordpress-nextjs-analytics-dashboard
+
+            # First deploy: clone. Subsequent: pull.
+            if [ ! -d "$APP_DIR" ]; then
+              git clone https://github.com/HawkeyePierce89/wordpress-nextjs-analytics-dashboard.git "$APP_DIR"
+            fi
+
+            cd "$APP_DIR"
+            git fetch origin master
+            git reset --hard origin/master
+
+            docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+
+            # Wait for containers to be healthy
+            sleep 10
+            docker compose -f docker-compose.prod.yml ps
