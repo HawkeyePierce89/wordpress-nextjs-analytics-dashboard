@@ -2,6 +2,8 @@
 
 > A demo project showcasing a headless WordPress setup where WordPress acts as a content backend and a custom Next.js dashboard provides internal teams with a better interface for content discovery, filtering, and analytics.
 
+https://wordpress-nextjs-analytics-dashboard.karmanov.ws/
+
 ## Why This Project
 
 Content teams using WordPress need better tools for reviewing content performance, filtering articles, and analyzing publishing patterns. This dashboard demonstrates building a custom internal tool that connects to WordPress via a custom REST API rather than the default WordPress admin — giving teams a faster, purpose-built interface tailored to their workflow.
